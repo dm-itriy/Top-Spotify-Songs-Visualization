@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xml:lang="en" lang="en">
+  <head>
+    <title>CSE442 | A3</title>
+    <style media="all">
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        margin: 0 auto 0 auto;
+        padding: 0;
+        max-width: 1200px;
+        font-family: "Avenir", "Avenir Next", Helvetica Neue, Arial;
+        font-size: 0.95em;
+      }
+
+      a,
+      a:visited {
+        text-decoration: none;
+        color: #7533f4;
+      }
+      a:hover {
+        text-decoration: underline;
+        color: #f4b014;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        color: #492a7c;
+        background-color: inherit;
+        font-weight: normal;
+        padding: 0 0 5px 0;
+        margin: 15px 0 0 0;
+        border: none;
+        clear: right;
+      }
+      h1 {
+        font-size: 24pt;
+        margin: 5px 0 10px 0;
+        line-height: 28px;
+      }
+      h2 {
+        font-size: 14pt;
+        margin: 30px 0 15px 0;
+        letter-spacing: 0.01em;
+        border-bottom: 1px solid #ccc;
+        line-height: 20px;
+      }
+      h3 {
+        font-size: 13pt;
+      }
+      h4 {
+        font-size: 12pt;
+      }
+      h5 {
+        font-size: 11pt;
+      }
+      p {
+        margin: 0 0 10px 0;
+      }
+      .content {
+        margin: 0;
+        padding: 15px 20px;
+        background-color: #ffffff;
+      }
+      .title,
+      .title h1,
+      .title a {
+        color: #492a7c;
+        font-size: 24pt;
+        margin-bottom: 20px;
+        margin-top: 5px;
+      }
+      .footer {
+        border-top: 1px solid #ccc;
+        margin-top: 30px;
+        padding-top: 4px;
+        text-align: right;
+        font-size: 12px;
+      }
+      .footer a {
+        color: #21346b;
+      }
+      .footer a:hover {
+        color: #ce3333;
+      }
+      #visualization {
+        margin-top: 20px;
+      }
+      #visualization rect:hover {
+        cursor: pointer;
+      }
+      #description {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      #play-btn {
+        padding: 5px 10px;
+        width: 100px;
+        margin: 10px;
+        outline: none;
+        border-radius: 10px;
+        border: none;
+        background-color: #492a7c;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 3px lightgray;
+        cursor: pointer;
+      }
+      #play-btn:active {
+        box-shadow: 0 1px lightgray;
+        transform: translateY(2px);
+      }
+      #week {
+        width: 100%;
+        margin: 10px;
+        -webkit-appearance: none;
+        border-radius: 20px;
+        appearance: none;
+        height: 15px; /* Specified height */
+        background: lightgray; /* Grey background */
+        outline: none; /* Remove outline */
+        -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+        transition: opacity 0.2s;
+      }
+      #week::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        border-radius: 20px;
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: #492a7c;
+        cursor: grab;
+      }
+      #scrubber-label {
+        width: 20%;
+        margin-left: 10px;
+      }
+      #controls {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <section class="title">
+        <a href="/">Top Spotify Songs</a>
+      </section>
+
+      <section>
+        <p>
+          <strong>Team Members</strong>: Leon Li, Evelyn Yang, Lauren Kim,
+          Dmitriy Nikitinskyy
+        </p>
+      </section>
+
+      <section>
+        <h2>How Do The Top 20 Spotify Songs Change Each Week From January 2021 to October 2021?</h2>
+      </section>
+      <section id="visualization">
+        <p id="description">
+          This visualization shows the top 20 Spotify songs
+          with the highest number of streams in different weeks throughout 2021. Use the slider to
+          view data from each week or click the "Play" button to move through
+          the weeks automatically. Hover over a song to see more information about its title,
+          artist, and streams. Click on a song to play it in the Spotify player.
+        </p>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="constants.js"></script>
+        <script src="index.js"></script>
+        <iframe
+          id="spotify-player"
+          src="https://open.spotify.com/embed/track/4MzXwWMhyBbmu6hOcLVD49?utm_source_generator"
+          width="100%"
+          height="80"
+          frameborder="0"
+          allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        >
+        </iframe>
+        <div id="controls">
+          <button id="play-btn" onclick="playAnimation()">Play</button>
+          <input
+            type="range"
+            id="week"
+            name="week"
+            min="0"
+            max="42"
+            value="0"
+            oninput="changeWeek(this.value)"
+          />
+          <label id="scrubber-label" for="week">Week</label>
+        </div>
+        <g></g>
+      </section>
+
+      <section>
+        <h2>Design Decisions</h2>
+        <p>
+          <b>Summary of visualization: </b>The goal of our visualization is to answer the question: "How Do The Top 20 Spotify Songs Change Each Week From January 2021 to December 2021?" The audience consists of people interested in how the most-streamed Spotify songs change over time. To summarize the visualization, we created a horizontal bar chart where each bar represents one song and the bars are sorted by number of streams. The x-axis represents the number of streams for a particular week and the y-axis contains the song names. There is a slider at the top of the page to allow the user to control which week is displayed and a button to automatically play transitions between the weeks.
+        </p>
+        <p>
+          <b>Design rationale: </b>We decided to use a horizontal bar chart because we are encoding categorical vs. quantitative values. The bars are sorted by number of streams so the audience can easily see their rankings compared to each other. Each bar is mapped to a distinct color so its ranking can be visually tracked as the weeks change. We used a set of maximally distinct colors to ensure that no two bars will be too similar to each other. We also decided to shorten song names if they were over 20 characters on the y-axis labels and portray the number of streams on the x-axis in terms of millions to make the axis labels less cluttered and more readable.
+        </p>
+        <p>
+          To allow the audience to explore the data in more detail, we also allow the user to focus on particular songs within the chart. If the user is interested in a specific song, they can click on its bar to play the song in an embedded Spotify player, which lets them engage with the information they are seeing. When the mouse hovers over a bar, we outline the bar and display a tooltip containing more information (non-shortened name, artist, and number of streams) to allow the audience to learn more about a specific song. The tooltip's outline/shadow is the same color as the bar so it is easy to tell which bar it corresponds to. To aid the user with these interactions, we added explicit instructions at the top of the page explaining the possible functionalities. We also used implicit interactive cues such as changing the cursor to a pointer/grab hand when hovering over clickable/draggable elements and making the button move as if being physically pressed down.
+        </p>
+        <p>
+          To allow the user to see the changes in the top songs over time, we created a draggable scrubber to move between different weeks and create a story for the top 20 rankings over time. We added animations that matched what was happening to the songs week by week: we had the songs fade out when a song fell out of the top 20, translated existing bars to their new positions, and grew in new bars to represent a new song being added to the top 20. We chose this animation because the movement allows the audience to easily see how the songs are changing from week to week.
+        </p>
+        <p>
+          <b>Alternatives: </b>As an alternative encoding, we also considered displaying each bar as the same color since the color of a bar has nothing to do with the song itself, so making the bars different colors would have no meaning to the viewer. We ultimately decided against this since it made it difficult to track the progression of a particular song from week to week, which is one of the main focal points of the visualization. By making each song a different color, the viewer can easily see a bar and can track its changes based on its unique color. This also makes the animations more dynamic because the user can see the dramatic color change (which represents bars entering, exiting, and moving locations) from week to week.
+        </p>
+        <p>
+          Another alternative we considered was displaying the top 200 songs per week instead of the top 20 since this is what our dataset contains. The upside to this is that the viewer is able to see much more songs and thus a bigger picture of what the Spotify song charts look like per week. We decided against this because the graph became way too large and overwhelming, making it hard to read and track the position of a particular song as it moved around. We felt that filtering the data to the top 20 songs allows us to give the viewer a good picture of what the Spotify song charts look like while still allowing the graph to be easy to read.
+        </p>
+      </section>
+
+      <section>
+        <h2>Development Process</h2>
+        <p>
+          <b>Development process: </b>The following steps describe our development process, from compiling the data to creating the bar chart to adding animations/transitions.
+          <ol style="margin-left: 40px">
+            <li>Compiling/cleaning up data (Dmitriy)</li>
+            <li>Importing data (everyone)</li>
+            <li>Making axis + labels (everyone)</li>
+            <li>Putting bars on axis (everyone)</li>
+            <li>Adding unique colors to bars (Evelyn)</li>
+            <li>Adding tooltips to bars (Evelyn</li>
+            <li>Embedding Spotify play song feature (Dmitriy)</li>
+            <li>Basic scrubber to change weeks (Lauren, Leon)</li>
+            <li>Play button to animate playing weeks (Lauren, Evelyn, Leon)</li>
+            <li>Animating transitions between weeks (Leon, Evelyn, Dmitriy)</li>
+          </ol>
+        </p>
+        <p>
+          <b>Time and work balance: </b>Each of us spent roughly 16 hours working on the visualization, so 64 people-hours in total. We worked together by having one person code while everyone discussed how to approach the problem, doing research online about the available d3 functions and also how to solve the bugs that we encountered. We chose to do this in order to avoid merge conflicts and also since we found it faster to solve problems as a group. Although we did this for the majority of the project, we also spent some time implementing individual features on our own time if they were small and did not require a group effort.
+        </p>
+        <p>
+          <b>Most time-consuming aspects: </b>The two most time-consuming elements of our visualization were adding the scrubber and also animations to the bars on the graph. Initially we thought we’d be able to use existing components and functionality, but we ended up having to implement the scrubber and animations for each bar without external libraries and code. It took a few hours to implement basic scrubber functionality using an HTML range input element, and a few more hours to polish it and remove lagging. After creating the draggable scrubber, we also wanted to add a play button. We had to fix behavior for many different edge cases, such as clicking multiple times and dragging while playing, and also added the ability for the user to pause on a certain week. The process of trying to animate the transitions for the bars as the weeks changed was the most time-consuming. We initially regenerated the visualization each time the week changed, but animating the bars required us to generate the visualization once and edit the domain of the y-axis as well as the data being generated instead. This change took a long time to implement because we had to re-think our approach for displaying the bars for different weeks.
+        </p>
+      </section>
+
+      <section>
+        <h2>Citations</h2>
+        <ul>
+          <li>Spotify song data: <a href="https://spotifycharts.com/regional/global/weekly/latest" target="_blank">https://spotifycharts.com/regional/global/weekly/latest</a></li>
+          <li>Color hex codes: <a href="https://graphicdesign.stackexchange.com/revisions/3815/8" target="_blank">https://graphicdesign.stackexchange.com/revisions/3815/8</a></li>
+          <li>Reference for creating axes and animations: <a href="https://observablehq.com/@uwdata/introduction-to-d3-part-2" target="_blank">https://observablehq.com/@uwdata/introduction-to-d3-part-2</a></li>
+          <li>Reference for creating scrubber and animations: <a href="https://www.youtube.com/watch?v=kz4OCMzkEnY" target="_blank">https://www.youtube.com/watch?v=kz4OCMzkEnY</a></li>
+          <li>Reference for embedding spotify song player: <a href="https://newsroom.spotify.com/2018-09-04/how-to-embed-spotifys-play-button" target="_blank">https://newsroom.spotify.com/2018-09-04/how-to-embed-spotifys-play-button</a></li>
+        </ul>
+      </section>
+
+      <div class="footer">
+        <a href="https://courses.cs.washington.edu/courses/cse442/21au/"
+          >CSE 442 Data Visualization</a
+        >
+        <a href="http://www.washington.edu">University of Washington</a>
+      </div>
+    </div>
+  </body>
+</html>
